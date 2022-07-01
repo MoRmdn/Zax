@@ -6,19 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:zax/helper/helper.dart';
 
 import '../models/person.dart';
-
-@immutable
-abstract class LoadAction {
-  const LoadAction();
-}
-
-@immutable
-class LoadPersonsAction implements LoadAction {
-  final PersonUrl fileUrl;
-  const LoadPersonsAction({
-    required this.fileUrl,
-  }) : super();
-}
+import 'bloc_actions.dart';
 
 Future<Iterable<Person>> getPersons(String url) => HttpClient()
     .getUrl(Uri.parse(url))
@@ -42,15 +30,25 @@ class FetchResult {
 
   @override
   String toString() =>
-      'FetchResult (isRetrievedFromCache = $isRetrievedFromCache, persons = $persons)';
+      'FetchResult (isRetrievedFromCache = $isRetrievedFromCache,persons = $persons)';
+  @override
+  bool operator ==(covariant FetchResult other) =>
+      persons.isEqualToIgnoringOrdering(other.persons) &&
+      isRetrievedFromCache == other.isRetrievedFromCache;
+
+  @override
+  int get hashCode => Object.hash(
+        persons,
+        isRetrievedFromCache,
+      );
 }
 
 class PersonsBloc extends Bloc<LoadAction, FetchResult?> {
-  final Map<PersonUrl, Iterable<Person>> _cache = {};
+  final Map<String, Iterable<Person>> _cache = {};
   PersonsBloc() : super(null) {
     on<LoadPersonsAction>(
       (event, emit) async {
-        final url = event.fileUrl;
+        final url = event.url;
         if (_cache.containsKey(url)) {
           // we have the value in the cache
           final cachedPersons = _cache[url]!;
@@ -60,7 +58,7 @@ class PersonsBloc extends Bloc<LoadAction, FetchResult?> {
           );
           emit(result);
         } else {
-          final persons = await getPersons(url.urlString);
+          final persons = await event.loader(url);
           _cache[url] = persons;
           final result = FetchResult(
             persons: persons,

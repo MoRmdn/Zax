@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'bloc/bloc_actions.dart';
 import 'bloc/bloc_provider.dart';
 import 'helper/helper.dart';
 import 'models/person.dart';
@@ -23,8 +24,7 @@ class HomePage extends StatelessWidget {
                 onPressed: () {
                   context.read<PersonsBloc>().add(
                         const LoadPersonsAction(
-                          fileUrl: PersonUrl.persons1,
-                        ),
+                            url: persons1Url, loader: getPersons),
                       );
                 },
                 child: const Text(
@@ -35,8 +35,7 @@ class HomePage extends StatelessWidget {
                 onPressed: () {
                   context.read<PersonsBloc>().add(
                         const LoadPersonsAction(
-                          fileUrl: PersonUrl.persons2,
-                        ),
+                            url: persons2Url, loader: getPersons),
                       );
                 },
                 child: const Text(

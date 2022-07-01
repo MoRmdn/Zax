@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
-enum PersonUrl {
-  persons1,
-  persons2,
-}
+const persons1Url = 'http://127.0.0.1:5500/api/persons1.json';
+const persons2Url = 'http://127.0.0.1:5500/api/persons2.json';
 
 @immutable
 class Person {
