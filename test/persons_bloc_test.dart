@@ -11,7 +11,7 @@ List<Person> mocPersons1 = const [
 
 List<Person> mocPersons2 = const [
   Person(name: "ahmed", age: 24),
-  Person(name: "saied", age: 23),
+  Person(name: "said", age: 23),
 ];
 Future<Iterable<Person>> mocPerson1(String _) => Future.value(mocPersons1);
 Future<Iterable<Person>> mocPerson2(String _) => Future.value(mocPersons2);
