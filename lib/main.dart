@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:zax/helper/app_config.dart';
 
-import 'bloc/bloc_provider.dart';
-import 'home.dart';
+void main() => runApp(
+      const MyApp(),
+    );
 
-void main() {
-  runApp(
-    MaterialApp(
-      title: 'Zax',
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            AppConfig.appTitle,
+          ),
+        ),
       ),
-      home: BlocProvider(
-        create: (_) => PersonsBloc(),
-        child: const HomePage(),
-      ),
-    ),
-  );
+    );
+  }
 }

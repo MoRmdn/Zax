@@ -21,35 +21,37 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Zax")),
+      appBar: AppBar(title: const Text('Zax')),
       body: StreamBuilder(
-          stream: cubit.stream,
-          builder: (context, snapshot) {
-            final button = TextButton(
-              onPressed: () => cubit.getName(),
-              child: const Text(
-                "Pick a random name",
-              ),
-            );
+        stream: cubit.stream,
+        builder: (context, snapshot) {
+          final button = TextButton(
+            onPressed: () => cubit.getName(),
+            child: const Text(
+              'Pick a random name',
+            ),
+          );
 
-            switch (snapshot.connectionState) {
-              case ConnectionState.none:
-                return Center(child: button);
-              case ConnectionState.waiting:
-                return Center(child: button);
-              case ConnectionState.active:
-                return Center(
-                    child: Column(
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              return Center(child: button);
+            case ConnectionState.waiting:
+              return Center(child: button);
+            case ConnectionState.active:
+              return Center(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(snapshot.data as String? ?? ""),
+                    Text(snapshot.data as String? ?? ''),
                     button,
                   ],
-                ));
-              case ConnectionState.done:
-                return const SizedBox();
-            }
-          }),
+                ),
+              );
+            case ConnectionState.done:
+              return const SizedBox();
+          }
+        },
+      ),
     );
   }
 }
