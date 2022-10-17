@@ -1,8 +1,17 @@
+import 'package:flutter/material.dart' show Colors, Color;
+
 enum LoginErrorHandler {
   invalidData,
 }
 
-class AppConfig {}
+class AppConfig {
+  static const Color authColors = Colors.white;
+  static const double textFieldSized = 0.8;
+
+  //* login Screen
+  static const loginRouteName = '/loginScreen';
+  static const loginBackgroundImage = 'assets/images/2.png';
+}
 
 class ConstStrings {
   static const appTitle = 'Flutter Notes';
@@ -21,6 +30,6 @@ class ConstStrings {
   static const enterYourPasswordHere = 'Enter your password here...';
   static const enterYourEmailHere = 'Enter your email here...';
   static const ok = 'OK';
-  static const login = 'Log in';
+  static const login = 'Login';
   static const homePage = 'Home Page';
 }

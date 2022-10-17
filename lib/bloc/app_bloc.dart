@@ -17,6 +17,8 @@ class AppBloc extends Bloc<AppActions, AppState> {
   }) : super(
           const AppState.empty(),
         ) {
+    const tUser = LoginHandler.test();
+    const user = LoginHandler.user();
     //? first app action
     on<LoginAction>((event, emit) async {
       //* Start Loading Action
@@ -29,13 +31,22 @@ class AppBloc extends Bloc<AppActions, AppState> {
         ),
       );
       //* logging user in
-      final loginH =
-          await loginApi.login(email: event.email, password: event.password);
+      final tLogin = await loginApi.testLogin(
+        email: event.email,
+        password: event.password,
+      );
+      final uLogin = await loginApi.login(
+        email: event.email,
+        password: event.password,
+      );
       emit(
         AppState(
           isLoading: true,
-          loginError: loginH == null ? LoginErrorHandler.invalidData : null,
-          loginHandle: loginH,
+          //? why this is error could be any user
+          loginError: tLogin == null && uLogin == null
+              ? LoginErrorHandler.invalidData
+              : null,
+          loginHandle: tLogin ?? uLogin,
           notes: null,
         ),
       );
@@ -52,9 +63,10 @@ class AppBloc extends Bloc<AppActions, AppState> {
           notes: null,
         ),
       );
-      //* check if loginHandle == LoginHandler.test() .... if true load notes
+      //? check if loginHandle == LoginHandler.test() .... if true load notes
+      //* this is the state of the action before (loginAction) i should save it to prevent it from overwrite
       final loginHandle = state.loginHandle;
-      if (loginHandle != const LoginHandler.test()) {
+      if (loginHandle != tUser || loginHandle != user) {
         emit(
           AppState(
             isLoading: false,

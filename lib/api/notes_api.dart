@@ -11,9 +11,12 @@ abstract class NotesAPIProtocol {
 }
 
 class NoteAPI implements NotesAPIProtocol {
+  //* a software design pattern that restricts the instantiation of a class to one "single" instance.
+  //* override default constructor with this constructor to prevent it to initialized
   const NoteAPI._onlyInstance();
   static const NoteAPI _shared = NoteAPI._onlyInstance();
   factory NoteAPI.instance() => _shared;
+
   @override
   Future<Iterable<Notes>?> noteLoader({
     required loginHandler,
@@ -25,14 +28,3 @@ class NoteAPI implements NotesAPIProtocol {
         (testLogin) => testLogin ? dummyNotes : null,
       );
 }
-
-// class Test implements NoteAPI {
-//   @override
-//   Future<Iterable<Notes>?> noteLoader({required loginHandler}) {
-//     throw UnimplementedError();
-//   }
-// }
-
-// class Test2 extends NoteAPI {
-//   Test2() : super._onlyInstance();
-// }

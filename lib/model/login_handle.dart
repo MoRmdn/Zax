@@ -8,6 +8,7 @@ class LoginHandler {
   });
 
   const LoginHandler.test() : token = 'test';
+  const LoginHandler.user() : token = 'user';
 
   // instead of instance of loginHandler will print the string
   @override
