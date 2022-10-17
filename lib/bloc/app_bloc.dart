@@ -3,7 +3,6 @@ import 'package:zax/api/login_api.dart';
 import 'package:zax/api/notes_api.dart';
 import 'package:zax/bloc/app_action.dart';
 import 'package:zax/bloc/app_state.dart';
-import 'package:zax/dummy/dummy_notes.dart';
 import 'package:zax/helper/app_config.dart';
 import 'package:zax/model/login_handle.dart';
 
@@ -53,7 +52,7 @@ class AppBloc extends Bloc<AppActions, AppState> {
     });
 
     //? second Action in app
-    on<NotesAction>((event, emit) {
+    on<NotesAction>((event, emit) async {
       //* Start Loading Action
       emit(
         AppState(
@@ -77,12 +76,13 @@ class AppBloc extends Bloc<AppActions, AppState> {
         );
         return;
       }
+      final notes = await notesApi.noteLoader(loginHandler: loginHandle!);
       emit(
         AppState(
           isLoading: false,
           loginError: null,
           loginHandle: loginHandle,
-          notes: dummyNotes,
+          notes: notes,
         ),
       );
     });

@@ -61,6 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: size.width * AppConfig.textFieldSized,
                   child: TextField(
                     controller: email,
+                    keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.all(20),
                       hintText: 'Email',
@@ -78,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: TextField(
                     controller: password,
                     obscureText: true,
-                    obscuringCharacter: '*',
+                    obscuringCharacter: '◉',
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.all(20),
                       hintText: 'Password',
