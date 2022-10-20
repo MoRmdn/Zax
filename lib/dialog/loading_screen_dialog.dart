@@ -1,19 +1,21 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:zax/helper/app_config.dart';
 import 'package:zax/helper/loading_controller.dart';
 
 class LoadingScreen {
   //* class singleton
   LoadingScreen._onlyInstance();
   static final _shared = LoadingScreen._onlyInstance();
-  factory LoadingScreen() => _shared;
+  factory LoadingScreen.instance() => _shared;
 
   LoadingScreenController? _controller;
 
   void show({
     required BuildContext context,
     required String content,
+    Size? dSize,
   }) {
     if (_controller?.update(content) ?? false) {
       return;
@@ -21,6 +23,7 @@ class LoadingScreen {
       _controller = _loadingDialogOverLay(
         context: context,
         dialogContent: content,
+        dSize: dSize,
       );
     }
   }
@@ -34,14 +37,19 @@ class LoadingScreen {
   LoadingScreenController _loadingDialogOverLay({
     required BuildContext context,
     required String dialogContent,
+    //* size of this widget as it's context widget size
+    Size? dSize,
   }) {
     //? add text to the stream
     final text = StreamController<String>();
     text.add(dialogContent);
 
+    //? save the state of the current widget and insert overlay on this state
     final state = Overlay.of(context);
+
+    //? determine overlay size based on context of the widget where i call overlay on
     final renderBox = context.findRenderObject() as RenderBox;
-    final size = renderBox.size;
+    final size = dSize ?? renderBox.size;
 
     final overlay = OverlayEntry(
       builder: (context) {
@@ -67,7 +75,11 @@ class LoadingScreen {
                       const SizedBox(
                         height: 10,
                       ),
-                      const CircularProgressIndicator(),
+                      Image.asset(
+                        AppConfig.loadingColorizedGif,
+                        width: 75,
+                        height: 75,
+                      ),
                       const SizedBox(
                         height: 20,
                       ),
