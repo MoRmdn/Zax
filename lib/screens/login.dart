@@ -1,14 +1,23 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zax/helper/app_config.dart';
+import 'package:zax/screens/widget/login_screen/auth_view.dart';
 import 'package:zax/screens/widget/login_screen/custom_text_button.dart';
-import 'package:zax/screens/widget/login_screen/custom_text_field.dart';
-import 'package:zax/screens/widget/login_screen/login_button.dart';
-import 'package:zax/screens/widget/login_screen/password_text_field.dart';
+
+import '../dialog/custom_generic_dialog.dart';
+import '../dialog/loading_screen_dialog.dart';
+
+typedef OnLoginTapped = void Function(
+  String email,
+  String password,
+);
 
 class LoginScreen extends StatefulWidget {
   static const routeName = AppConfig.loginRouteName;
-  const LoginScreen({super.key});
+  final OnLoginTapped onLoggingIn;
+  const LoginScreen({super.key, required this.onLoggingIn});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -19,10 +28,12 @@ class LoginScreen extends StatefulWidget {
 //? The latter is more optimized for when you only need to use a single ticker, which should be most of the case.
 class _LoginScreenState extends State<LoginScreen>
     with SingleTickerProviderStateMixin {
-  bool isLogin = true;
-  bool isSignUp = false;
-  bool isForgetPassword = false;
-  bool isAnimated = false;
+  AuthPageController pageController = AuthPageController.loginPage;
+  // bool isLogin = true;
+  // bool isSignUp = false;
+  // bool isForgetPassword = false;
+  // bool isAnimated = false;
+  final loading = LoadingScreen.instance();
   final emailController = TextEditingController();
   final nameController = TextEditingController();
   final passwordController = TextEditingController();
@@ -37,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen>
       duration: const Duration(milliseconds: 500),
     );
 
-    //* values that animation work between
+    //* values of size that animation works between
     _animationTween = Tween<Size>(
       begin: const Size(double.infinity, 230),
       end: const Size(double.infinity, 300),
@@ -61,162 +72,209 @@ class _LoginScreenState extends State<LoginScreen>
     super.dispose();
   }
 
-  void _switchController(String title) => setState(() {
-        if (title == AppConfig.login) {
-          isLogin = true;
-          isSignUp = false;
-          isForgetPassword = false;
-          isAnimated
-              ? _animationController!.reverse().then(
-                    (value) => isAnimated = false,
-                  )
-              : null;
-        } else if (title == AppConfig.signUp) {
-          isLogin = false;
-          isForgetPassword = false;
-          isSignUp = true;
-          _animationController!.forward().then(
-                (value) => isAnimated = true,
-              );
-        } else {
-          isLogin = false;
-          isSignUp = false;
-          isForgetPassword = true;
-          isAnimated
-              ? _animationController!.reverse().then(
-                    (value) => isAnimated = false,
-                  )
-              : null;
-        }
+  void _switchController(AuthPageController page) => setState(() {
+        pageController = page;
+        pageController == AuthPageController.signUpPage
+            ? _animationController!.forward()
+            : _animationController!.reverse();
+
+        //? without enum
+        // if (page == AppConfig.login) {
+        //   isLogin = true;
+        //   isSignUp = false;
+        //   isForgetPassword = false;
+        //   isAnimated
+        //       ? _animationController!.reverse().then(
+        //             (value) => isAnimated = false,
+        //           )
+        //       : null;
+        // } else if (page == AppConfig.signUp) {0
+        //   isLogin = false;
+        //   isForgetPassword = false;
+        //   isSignUp = true;
+        //   _animationController!.forward().then(
+        //         (value) => isAnimated = true,
+        //       );
+        // } else {
+        //   isLogin = false;
+        //   isSignUp = false;
+        //   isForgetPassword = true;
+        //   isAnimated
+        //       ? _animationController!.reverse().then(
+        //             (value) => isAnimated = false,
+        //           )
+        //       : null;
+        // }
       });
+
+  void _dialogBox(String title, String content) {
+    //const
+    loading.show(
+      context: context,
+      content: AppConfig.pleaseWait,
+    );
+
+    Future.delayed(const Duration(seconds: 1)).then((value) {
+      loading.hide();
+      customGenericDialog(
+        context: context,
+        title: title,
+        content: content,
+        dialogOptions: () {
+          return {
+            AppConfig.ok: true,
+          };
+        },
+      );
+    });
+  }
+
+  bool _checkEmptyTextField() {
+    final email = emailController.text;
+    final name = nameController.text;
+    final password = passwordController.text;
+    if (pageController == AuthPageController.loginPage) {
+      if (email.isEmpty || password.isEmpty) {
+        _dialogBox(
+          AppConfig.emailOrPasswordEmptyDialogTitle,
+          AppConfig.emailOrPasswordEmptyDialogTitle,
+        );
+        return false;
+      }
+      return true;
+    } else if (pageController == AuthPageController.signUpPage) {
+      if (email.isEmpty || password.isEmpty || name.isEmpty) {
+        _dialogBox(
+          AppConfig.emailOrPasswordOrNameEmptyDialogTitle,
+          AppConfig.emailOrPasswordOrNameEmptyDialogTitle,
+        );
+        return false;
+      }
+      return true;
+    } else if (pageController == AuthPageController.forgetPassword) {
+      if (email.isEmpty) {
+        _dialogBox(
+          AppConfig.forgetPasswordEmptyTitle,
+          AppConfig.forgetPasswordEmptyDescription,
+        );
+        return false;
+      }
+      return true;
+    }
+    return true;
+  }
+
+  void _onSave() {
+    final email = emailController.text;
+    final password = passwordController.text;
+    final emptyError = _checkEmptyTextField();
+    if (!emptyError) {
+      log('EmptyFieldError');
+      return;
+    }
+
+    if (pageController == AuthPageController.loginPage) {
+      log('$email &&&&&&&  $password');
+      widget.onLoggingIn(email, password);
+      //? Login Auth
+    } else if (pageController == AuthPageController.signUpPage) {
+      //? Sign Up Logic
+    } else if (pageController == AuthPageController.forgetPassword) {
+      //? Reset Password
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      body: Container(
-        width: size.width,
-        constraints: BoxConstraints(
-          maxHeight: size.height,
-          maxWidth: size.width,
-        ),
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(
-              isLogin
-                  ? AppConfig.loginBackgroundImage
-                  : isSignUp
-                      ? AppConfig.signUpBackgroundImage
-                      : AppConfig.forgetPasswordBackgroundImage,
-            ),
-            fit: BoxFit.cover,
+      body: SafeArea(
+        child: Container(
+          width: size.width,
+          constraints: BoxConstraints(
+            maxHeight: size.height,
+            maxWidth: size.width,
           ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Expanded(
-              flex: 2,
-              child: SizedBox(),
-            ),
-            Text(
-              isLogin
-                  ? AppConfig.login
-                  : isSignUp
-                      ? AppConfig.signUp
-                      : AppConfig.forgetPassword,
-              style: GoogleFonts.lato(
-                color: isForgetPassword
-                    ? AppConfig.primaryColor
-                    : AppConfig.authColors,
-                textStyle: isForgetPassword
-                    ? Theme.of(context).textTheme.headline3
-                    : Theme.of(context).textTheme.headline2,
-                // fontSize: 48,
-                fontWeight: FontWeight.w900,
-                fontStyle: FontStyle.italic,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(
+                pageController == AuthPageController.loginPage
+                    ? AppConfig.loginBackgroundImage
+                    : pageController == AuthPageController.signUpPage
+                        ? AppConfig.signUpBackgroundImage
+                        : AppConfig.forgetPasswordBackgroundImage,
               ),
+              fit: BoxFit.cover,
             ),
-            SizedBox(height: size.height * 0.05),
-            SingleChildScrollView(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: const EdgeInsets.all(10),
-                height: _animationTween!.value.height,
-                constraints: BoxConstraints(
-                  minHeight: _animationTween!.value.height,
-                  maxWidth: size.width * 0.8,
-                ),
-                child: ListView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    if (isLogin || isSignUp)
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (isSignUp)
-                            SizedBox(
-                              child: CustomTextField(
-                                controller: emailController,
-                                textHint: AppConfig.enterYourNameHere,
-                              ),
-                            ),
-                          SizedBox(
-                            child: CustomTextField(
-                              controller: emailController,
-                              textHint: AppConfig.enterYourEmailHere,
-                            ),
-                          ),
-                          SizedBox(
-                            child: CustomPasswordTextField(
-                              passwordController: passwordController,
-                            ),
-                          ),
-                        ],
-                      ),
-                    if (isForgetPassword)
-                      SizedBox(
-                        child: CustomTextField(
-                          controller: emailController,
-                          textHint: AppConfig.enterYourEmailHere,
-                        ),
-                      ),
-                    LoginButton(
-                      title: isLogin
-                          ? AppConfig.login
-                          : isSignUp
-                              ? AppConfig.signUp
-                              : AppConfig.resetPassword,
-                      emailController: emailController,
-                      passwordController: passwordController,
-                      onLoginTapped: (String email, String password) {},
-                    ),
-                  ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              //? Top Space
+              const Expanded(
+                flex: 2,
+                child: SizedBox(),
+              ),
+              //? page title
+              Text(
+                pageController == AuthPageController.loginPage
+                    ? AppConfig.login
+                    : pageController == AuthPageController.signUpPage
+                        ? AppConfig.signUp
+                        : AppConfig.forgetPassword,
+                style: GoogleFonts.lato(
+                  color: pageController == AuthPageController.forgetPassword
+                      ? AppConfig.primaryColor
+                      : AppConfig.authColors,
+                  textStyle: pageController == AuthPageController.forgetPassword
+                      ? Theme.of(context).textTheme.headline3
+                      : Theme.of(context).textTheme.headline2,
+                  // fontSize: 48,
+                  fontWeight: FontWeight.w900,
+                  fontStyle: FontStyle.italic,
                 ),
               ),
-            ),
-            CustomTextButton(
-              changeColor: isForgetPassword,
-              title: isLogin ? AppConfig.signUp : AppConfig.login,
-              buttonFun: () => _switchController(
-                isLogin ? AppConfig.signUp : AppConfig.login,
+
+              SizedBox(height: size.height * 0.05),
+              AuthView(
+                animationTween: _animationTween!,
+                animationController: _animationController!,
+                size: size,
+                loading: loading,
+                emailController: emailController,
+                nameController: nameController,
+                passwordController: passwordController,
+                pageController: pageController,
+                onLoginTap: _onSave,
               ),
-            ),
-            if (isLogin)
               CustomTextButton(
-                changeColor: isForgetPassword,
-                title: AppConfig.forgetPassword,
+                changeColor: pageController == AuthPageController.forgetPassword
+                    ? true
+                    : false,
+                title: pageController == AuthPageController.loginPage
+                    ? AppConfig.signUp
+                    : AppConfig.login,
                 buttonFun: () => _switchController(
-                  AppConfig.forgetPassword,
+                  pageController == AuthPageController.loginPage
+                      ? AuthPageController.signUpPage
+                      : AuthPageController.loginPage,
                 ),
               ),
-            const Expanded(child: SizedBox()),
-          ],
+              if (pageController == AuthPageController.loginPage)
+                CustomTextButton(
+                  title: AppConfig.forgetPassword,
+                  buttonFun: () => _switchController(
+                    AuthPageController.forgetPassword,
+                  ),
+                ),
+              //? bottom Space
+              const Expanded(
+                child: SizedBox(),
+              ),
+            ],
+          ),
         ),
       ),
     );

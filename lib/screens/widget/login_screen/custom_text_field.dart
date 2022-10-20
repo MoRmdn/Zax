@@ -19,6 +19,7 @@ class CustomTextField extends StatelessWidget {
         controller: controller,
         keyboardType: kType,
         decoration: InputDecoration(
+          label: Text(textHint),
           contentPadding:
               const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           hintText: textHint,

@@ -21,6 +21,9 @@ class CustomPasswordTextField extends StatelessWidget {
         obscureText: true,
         obscuringCharacter: '◉',
         decoration: InputDecoration(
+          label: const Text(
+            AppConfig.enterYourPasswordHere,
+          ),
           contentPadding:
               const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           hintText: AppConfig.enterYourPasswordHere,

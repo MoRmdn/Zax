@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../../dialog/custom_generic_dialog.dart';
-
-typedef OnLoginTapped = void Function(
-  String email,
-  String password,
-);
-
 class LoginButton extends StatelessWidget {
   final String title;
   final TextEditingController emailController;
   final TextEditingController passwordController;
-  final OnLoginTapped onLoginTapped;
+  final VoidCallback onLoginTapped;
+
   const LoginButton({
     super.key,
     required this.emailController,
@@ -41,16 +35,7 @@ class LoginButton extends StatelessWidget {
           //   const Color(0xffFDFEF7),
           // ),
         ),
-        onPressed: () {
-          customGenericDialog(
-            context: context,
-            title: 'login',
-            content: 'content',
-            dialogOptions: () {
-              return {'String': true};
-            },
-          );
-        },
+        onPressed: onLoginTapped,
         child: Text(title),
       ),
     );
