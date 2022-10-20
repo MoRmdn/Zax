@@ -1,12 +1,13 @@
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:zax/dummy/dummy_notes.dart';
+import 'package:zax/models/login_handle.dart';
 import 'package:zax/models/note_handle.dart';
 
 @immutable
 abstract class NotesAPIProtocol {
   const NotesAPIProtocol();
   Future<Iterable<Notes>?> noteLoader({
-    required loginHandler,
+    required LoginHandler loginHandler,
   });
 }
 
@@ -19,11 +20,11 @@ class NoteAPI implements NotesAPIProtocol {
 
   @override
   Future<Iterable<Notes>?> noteLoader({
-    required loginHandler,
+    required LoginHandler loginHandler,
   }) =>
       Future.delayed(
         const Duration(seconds: 1),
-        () => loginHandler == loginHandler.test,
+        () => loginHandler == const LoginHandler.test(),
       ).then(
         (testLogin) => testLogin ? dummyNotes : null,
       );
