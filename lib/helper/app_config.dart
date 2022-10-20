@@ -18,8 +18,9 @@ class AppConfig {
 
   static const login = 'Login';
   static const signUp = 'Sign Up';
-  static const register = 'don\'t have account? join us now';
+  static const register = 'join us now';
   static const forgetPassword = 'Forget Password';
+  static const resetPassword = 'Reset';
 
   static const emailOrPasswordEmptyDialogTitle =
       'Please fill in both email and the password fields';
@@ -31,7 +32,10 @@ class AppConfig {
 
   static const enterYourPasswordHere = 'Enter your password here...';
   static const enterYourEmailHere = 'Enter your email here...';
+  static const enterYourNameHere = 'Enter your name here...';
   static const loginBackgroundImage = 'assets/images/2.png';
+  static const signUpBackgroundImage = 'assets/images/1.png';
+  static const forgetPasswordBackgroundImage = 'assets/images/3.png';
 
   //? generic
   static const pleaseWait = 'Please wait...';

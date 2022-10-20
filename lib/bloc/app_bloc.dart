@@ -4,7 +4,7 @@ import 'package:zax/api/notes_api.dart';
 import 'package:zax/bloc/app_action.dart';
 import 'package:zax/bloc/app_state.dart';
 import 'package:zax/helper/app_config.dart';
-import 'package:zax/model/login_handle.dart';
+import 'package:zax/models/login_handle.dart';
 
 class AppBloc extends Bloc<AppActions, AppState> {
   final LoginAPIProtocol loginApi;

@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart' show immutable;
-import 'package:zax/model/login_handle.dart';
+import 'package:zax/models/login_handle.dart';
 
 @immutable
 abstract class LoginAPIProtocol {

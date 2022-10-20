@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:zax/dummy/dummy_notes.dart';
-import 'package:zax/model/note_handle.dart';
+import 'package:zax/models/note_handle.dart';
 
 @immutable
 abstract class NotesAPIProtocol {

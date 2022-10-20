@@ -12,20 +12,24 @@ class CustomPasswordTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: passwordController,
-      keyboardType: TextInputType.visiblePassword,
-      autocorrect: false,
-      obscureText: true,
-      obscuringCharacter: '◉',
-      decoration: InputDecoration(
-        contentPadding: const EdgeInsets.all(20),
-        hintText: AppConfig.enterYourPasswordHere,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30.0),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextField(
+        controller: passwordController,
+        keyboardType: TextInputType.visiblePassword,
+        autocorrect: false,
+        obscureText: true,
+        obscuringCharacter: '◉',
+        decoration: InputDecoration(
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          hintText: AppConfig.enterYourPasswordHere,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30.0),
+          ),
+          filled: true, //<-- SEE HERE
+          fillColor: AppConfig.authColors,
         ),
-        filled: true, //<-- SEE HERE
-        fillColor: AppConfig.authColors,
       ),
     );
   }
