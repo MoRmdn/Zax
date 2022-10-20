@@ -17,6 +17,6 @@ class LoginAction implements AppActions {
 }
 
 @immutable
-class NotesAction implements AppActions {
-  const NotesAction();
+class LoadNotesAction implements AppActions {
+  const LoadNotesAction();
 }
