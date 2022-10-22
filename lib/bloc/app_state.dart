@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:zax/helper/app_config.dart';
-import 'package:zax/model/login_handle.dart';
+import 'package:zax/models/login_handle.dart';
 
-import '../model/note_handle.dart';
+import '../models/note_handle.dart';
 
 @immutable
 class AppState {

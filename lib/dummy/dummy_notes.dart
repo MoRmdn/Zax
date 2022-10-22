@@ -1,4 +1,4 @@
-import 'package:zax/model/note_handle.dart';
+import 'package:zax/models/note_handle.dart';
 
 //* generate Iterable with certain number (index)
 final dummyTestNotes = Iterable.generate(

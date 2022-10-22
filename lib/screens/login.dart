@@ -1,24 +1,187 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zax/helper/app_config.dart';
+import 'package:zax/screens/widget/login_screen/auth_view.dart';
+import 'package:zax/screens/widget/login_screen/custom_text_button.dart';
+
+import '../dialog/custom_generic_dialog.dart';
+import '../dialog/loading_screen_dialog.dart';
+
+typedef OnLoginTapped = void Function(
+  String email,
+  String password,
+);
 
 class LoginScreen extends StatefulWidget {
   static const routeName = AppConfig.loginRouteName;
-  const LoginScreen({super.key});
+  final OnLoginTapped onLoggingIn;
+  const LoginScreen({super.key, required this.onLoggingIn});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final email = TextEditingController();
-  final password = TextEditingController();
+//? When an AnimationController is being created from a State,
+//? you should have the State to extend either TickerProviderStateMixin or SingleTickerProviderStateMixin.
+//? The latter is more optimized for when you only need to use a single ticker, which should be most of the case.
+class _LoginScreenState extends State<LoginScreen>
+    with SingleTickerProviderStateMixin {
+  AuthPageController pageController = AuthPageController.loginPage;
+  // bool isLogin = true;
+  // bool isSignUp = false;
+  // bool isForgetPassword = false;
+  // bool isAnimated = false;
+  final loading = LoadingScreen.instance();
+  final emailController = TextEditingController();
+  final nameController = TextEditingController();
+  final passwordController = TextEditingController();
+  AnimationController? _animationController;
+  Animation<Size>? _animationTween;
+
+  @override
+  void initState() {
+    //* control the state and duration
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+
+    //* values of size that animation works between
+    _animationTween = Tween<Size>(
+      begin: const Size(double.infinity, 230),
+      end: const Size(double.infinity, 300),
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController!,
+        curve: Curves.linear,
+      ),
+    );
+    //? to listen to any change and update UI
+    _animationController!.addListener(() => setState(() {}));
+    super.initState();
+  }
 
   @override
   void dispose() {
-    email.dispose();
-    password.dispose();
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    _animationController!.dispose();
     super.dispose();
+  }
+
+  void _switchController(AuthPageController page) => setState(() {
+        pageController = page;
+        pageController == AuthPageController.signUpPage
+            ? _animationController!.forward()
+            : _animationController!.reverse();
+
+        //? without enum
+        // if (page == AppConfig.login) {
+        //   isLogin = true;
+        //   isSignUp = false;
+        //   isForgetPassword = false;
+        //   isAnimated
+        //       ? _animationController!.reverse().then(
+        //             (value) => isAnimated = false,
+        //           )
+        //       : null;
+        // } else if (page == AppConfig.signUp) {0
+        //   isLogin = false;
+        //   isForgetPassword = false;
+        //   isSignUp = true;
+        //   _animationController!.forward().then(
+        //         (value) => isAnimated = true,
+        //       );
+        // } else {
+        //   isLogin = false;
+        //   isSignUp = false;
+        //   isForgetPassword = true;
+        //   isAnimated
+        //       ? _animationController!.reverse().then(
+        //             (value) => isAnimated = false,
+        //           )
+        //       : null;
+        // }
+      });
+
+  void _dialogBox(String title, String content) {
+    //const
+    loading.show(
+      context: context,
+      content: AppConfig.pleaseWait,
+    );
+
+    Future.delayed(const Duration(seconds: 1)).then((value) {
+      loading.hide();
+      customGenericDialog(
+        context: context,
+        title: title,
+        content: content,
+        dialogOptions: () {
+          return {
+            AppConfig.ok: true,
+          };
+        },
+      );
+    });
+  }
+
+  bool _checkEmptyTextField() {
+    final email = emailController.text;
+    final name = nameController.text;
+    final password = passwordController.text;
+    if (pageController == AuthPageController.loginPage) {
+      if (email.isEmpty || password.isEmpty) {
+        _dialogBox(
+          AppConfig.emailOrPasswordEmptyDialogTitle,
+          AppConfig.emailOrPasswordEmptyDialogTitle,
+        );
+        return false;
+      }
+      return true;
+    } else if (pageController == AuthPageController.signUpPage) {
+      if (email.isEmpty || password.isEmpty || name.isEmpty) {
+        _dialogBox(
+          AppConfig.emailOrPasswordOrNameEmptyDialogTitle,
+          AppConfig.emailOrPasswordOrNameEmptyDialogTitle,
+        );
+        return false;
+      }
+      return true;
+    } else if (pageController == AuthPageController.forgetPassword) {
+      if (email.isEmpty) {
+        _dialogBox(
+          AppConfig.forgetPasswordEmptyTitle,
+          AppConfig.forgetPasswordEmptyDescription,
+        );
+        return false;
+      }
+      return true;
+    }
+    return true;
+  }
+
+  void _onSave() {
+    final email = emailController.text;
+    final password = passwordController.text;
+    final emptyError = _checkEmptyTextField();
+    if (!emptyError) {
+      log('EmptyFieldError');
+      return;
+    }
+
+    if (pageController == AuthPageController.loginPage) {
+      log('$email &&&&&&&  $password');
+      widget.onLoggingIn(email, password);
+      //? Login Auth
+    } else if (pageController == AuthPageController.signUpPage) {
+      //? Sign Up Logic
+    } else if (pageController == AuthPageController.forgetPassword) {
+      //? Reset Password
+    }
   }
 
   @override
@@ -26,96 +189,92 @@ class _LoginScreenState extends State<LoginScreen> {
     final size = MediaQuery.of(context).size;
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      body: Container(
-        width: size.width,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(
-              AppConfig.loginBackgroundImage,
-            ),
-            fit: BoxFit.cover,
+      body: SafeArea(
+        child: Container(
+          width: size.width,
+          constraints: BoxConstraints(
+            maxHeight: size.height,
+            maxWidth: size.width,
           ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Expanded(
-              child: SizedBox(),
-            ),
-            Text(
-              ConstStrings.login,
-              style: GoogleFonts.lato(
-                color: AppConfig.authColors,
-                textStyle: Theme.of(context).textTheme.headline2,
-                // fontSize: 48,
-                fontWeight: FontWeight.w900,
-                fontStyle: FontStyle.italic,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(
+                pageController == AuthPageController.loginPage
+                    ? AppConfig.loginBackgroundImage
+                    : pageController == AuthPageController.signUpPage
+                        ? AppConfig.signUpBackgroundImage
+                        : AppConfig.forgetPasswordBackgroundImage,
               ),
+              fit: BoxFit.cover,
             ),
-            SizedBox(height: size.height * 0.05),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: size.width * AppConfig.textFieldSized,
-                  child: TextField(
-                    controller: email,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.all(20),
-                      hintText: 'Email',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                      filled: true, //<-- SEE HERE
-                      fillColor: AppConfig.authColors,
-                    ),
-                  ),
-                ),
-                SizedBox(height: size.height * 0.01),
-                SizedBox(
-                  width: size.width * AppConfig.textFieldSized,
-                  child: TextField(
-                    controller: password,
-                    obscureText: true,
-                    obscuringCharacter: '◉',
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.all(20),
-                      hintText: 'Password',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                      filled: true, //<-- SEE HERE
-                      fillColor: AppConfig.authColors,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: size.height * 0.05),
-            ElevatedButton(
-              style: ButtonStyle(
-                padding: MaterialStateProperty.all<EdgeInsetsGeometry?>(
-                  const EdgeInsets.symmetric(horizontal: 50),
-                ),
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                ),
-                foregroundColor: MaterialStateProperty.all<Color>(
-                  Colors.black,
-                ),
-                backgroundColor: MaterialStateProperty.all<Color>(
-                  const Color(0xffFDFEF7),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              //? Top Space
+              const Expanded(
+                flex: 2,
+                child: SizedBox(),
+              ),
+              //? page title
+              Text(
+                pageController == AuthPageController.loginPage
+                    ? AppConfig.login
+                    : pageController == AuthPageController.signUpPage
+                        ? AppConfig.signUp
+                        : AppConfig.forgetPassword,
+                style: GoogleFonts.lato(
+                  color: pageController == AuthPageController.forgetPassword
+                      ? AppConfig.primaryColor
+                      : AppConfig.authColors,
+                  textStyle: pageController == AuthPageController.forgetPassword
+                      ? Theme.of(context).textTheme.headline3
+                      : Theme.of(context).textTheme.headline2,
+                  // fontSize: 48,
+                  fontWeight: FontWeight.w900,
+                  fontStyle: FontStyle.italic,
                 ),
               ),
-              onPressed: null,
-              child: const Text(ConstStrings.login),
-            ),
-            const Expanded(child: SizedBox()),
-          ],
+
+              SizedBox(height: size.height * 0.05),
+              AuthView(
+                animationTween: _animationTween!,
+                animationController: _animationController!,
+                size: size,
+                loading: loading,
+                emailController: emailController,
+                nameController: nameController,
+                passwordController: passwordController,
+                pageController: pageController,
+                onLoginTap: _onSave,
+              ),
+              CustomTextButton(
+                changeColor: pageController == AuthPageController.forgetPassword
+                    ? true
+                    : false,
+                title: pageController == AuthPageController.loginPage
+                    ? AppConfig.signUp
+                    : AppConfig.login,
+                buttonFun: () => _switchController(
+                  pageController == AuthPageController.loginPage
+                      ? AuthPageController.signUpPage
+                      : AuthPageController.loginPage,
+                ),
+              ),
+              if (pageController == AuthPageController.loginPage)
+                CustomTextButton(
+                  title: AppConfig.forgetPassword,
+                  buttonFun: () => _switchController(
+                    AuthPageController.forgetPassword,
+                  ),
+                ),
+              //? bottom Space
+              const Expanded(
+                child: SizedBox(),
+              ),
+            ],
+          ),
         ),
       ),
     );
