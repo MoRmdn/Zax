@@ -9,8 +9,10 @@ import 'package:zax/models/login_handle.dart';
 class AppBloc extends Bloc<AppActions, AppState> {
   final LoginAPIProtocol loginApi;
   final NotesAPIProtocol notesApi;
+  final LoginHandler acceptedLoginHandle;
 
   AppBloc({
+    required this.acceptedLoginHandle,
     required this.loginApi,
     required this.notesApi,
   }) : super(
@@ -26,7 +28,7 @@ class AppBloc extends Bloc<AppActions, AppState> {
           isLoading: true,
           loginError: null,
           loginHandle: null,
-          notes: null,
+          fetchedNotes: null,
         ),
       );
       //* logging user in
@@ -41,7 +43,7 @@ class AppBloc extends Bloc<AppActions, AppState> {
           //? why this is error could be any user
           loginError: tLogin == null ? LoginErrorHandler.invalidData : null,
           loginHandle: tLogin,
-          notes: null,
+          fetchedNotes: null,
         ),
       );
     });
@@ -54,7 +56,7 @@ class AppBloc extends Bloc<AppActions, AppState> {
           isLoading: true,
           loginError: null,
           loginHandle: state.loginHandle,
-          notes: null,
+          fetchedNotes: null,
         ),
       );
       //? check if loginHandle == LoginHandler.test() .... if true load notes
@@ -66,7 +68,7 @@ class AppBloc extends Bloc<AppActions, AppState> {
             isLoading: false,
             loginError: LoginErrorHandler.invalidData,
             loginHandle: loginHandle,
-            notes: null,
+            fetchedNotes: null,
           ),
         );
         return;
@@ -77,7 +79,7 @@ class AppBloc extends Bloc<AppActions, AppState> {
           isLoading: false,
           loginError: null,
           loginHandle: loginHandle,
-          notes: notes,
+          fetchedNotes: notes,
         ),
       );
     });

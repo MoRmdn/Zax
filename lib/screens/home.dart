@@ -47,12 +47,12 @@ class _MyHomePageState extends State<MyHomePage> {
           if (state.isLoading == false &&
               state.loginError == null &&
               state.loginHandle == const LoginHandler.test() &&
-              state.notes == null) {
+              state.fetchedNotes == null) {
             context.read<AppBloc>().add(const LoadNotesAction());
           }
         },
         builder: (context, appState) {
-          final fetchedNotes = appState.notes;
+          final fetchedNotes = appState.fetchedNotes;
           if (fetchedNotes == null) {
             return LoginScreen(
               onLoggingIn: (email, password) => context.read<AppBloc>().add(
