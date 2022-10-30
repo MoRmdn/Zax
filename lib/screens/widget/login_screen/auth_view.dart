@@ -7,7 +7,7 @@ import 'custom_text_field.dart';
 import 'login_button.dart';
 
 @immutable
-class AuthView extends StatefulWidget {
+class AuthCard extends StatefulWidget {
   final LoadingScreen loading;
   final TextEditingController emailController;
   final TextEditingController nameController;
@@ -18,7 +18,7 @@ class AuthView extends StatefulWidget {
   final Animation<Size> animationTween;
   final VoidCallback onLoginTap;
 
-  const AuthView({
+  const AuthCard({
     super.key,
     required this.animationTween,
     required this.animationController,
@@ -32,10 +32,10 @@ class AuthView extends StatefulWidget {
   });
 
   @override
-  State<AuthView> createState() => _AuthViewState();
+  State<AuthCard> createState() => _AuthCardState();
 }
 
-class _AuthViewState extends State<AuthView> {
+class _AuthCardState extends State<AuthCard> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -53,48 +53,55 @@ class _AuthViewState extends State<AuthView> {
         child: ListView(
           physics: const NeverScrollableScrollPhysics(),
           children: [
-            if (widget.pageController == AuthPageController.loginPage ||
-                widget.pageController == AuthPageController.signUpPage)
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (widget.pageController == AuthPageController.signUpPage)
-                    SizedBox(
-                      child: CustomTextField(
-                        controller: widget.nameController,
-                        textHint: AppConfig.enterYourNameHere,
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.pageController == AuthPageController.signUpPage)
+                      SizedBox(
+                        child: CustomTextField(
+                          controller: widget.nameController,
+                          textHint: AppConfig.enterYourNameHere,
+                        ),
                       ),
-                    ),
-                  SizedBox(
-                    child: CustomTextField(
-                      controller: widget.emailController,
-                      textHint: AppConfig.enterYourEmailHere,
-                    ),
-                  ),
-                  SizedBox(
-                    child: CustomPasswordTextField(
-                      passwordController: widget.passwordController,
-                    ),
-                  ),
-                ],
-              ),
-            if (widget.pageController == AuthPageController.forgetPassword)
-              SizedBox(
-                child: CustomTextField(
-                  controller: widget.emailController,
-                  textHint: AppConfig.enterYourEmailHere,
+                    if (widget.pageController == AuthPageController.loginPage ||
+                        widget.pageController ==
+                            AuthPageController.signUpPage ||
+                        widget.pageController ==
+                            AuthPageController.forgetPassword)
+                      SizedBox(
+                        child: CustomTextField(
+                          controller: widget.emailController,
+                          textHint: AppConfig.enterYourEmailHere,
+                        ),
+                      ),
+                    if (widget.pageController == AuthPageController.loginPage ||
+                        widget.pageController == AuthPageController.signUpPage)
+                      SizedBox(
+                        child: CustomPasswordTextField(
+                          passwordController: widget.passwordController,
+                        ),
+                      ),
+                  ],
                 ),
-              ),
-            LoginButton(
-              title: widget.pageController == AuthPageController.loginPage
-                  ? AppConfig.login
-                  : widget.pageController == AuthPageController.signUpPage
-                      ? AppConfig.signUp
-                      : AppConfig.resetPassword,
-              emailController: widget.emailController,
-              passwordController: widget.passwordController,
-              onLoginTapped: widget.onLoginTap,
+                LoginButton(
+                  title: widget.pageController == AuthPageController.loginPage
+                      ? AppConfig.login
+                      : widget.pageController == AuthPageController.signUpPage
+                          ? AppConfig.signUp
+                          : AppConfig.resetPassword,
+                  emailController: widget.emailController,
+                  passwordController: widget.passwordController,
+                  onLoginTapped: widget.onLoginTap,
+                ),
+              ],
             ),
+            // const Expanded(
+            //   child: SizedBox(),
+            // ),
           ],
         ),
       ),

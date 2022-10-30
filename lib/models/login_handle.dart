@@ -28,6 +28,5 @@ class LoginHandler {
       other.token == token;
 
   @override
-  // TODO: implement hashCode
   int get hashCode => token.hashCode;
 }
