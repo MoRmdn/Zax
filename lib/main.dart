@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
               primary: AppConfig.primaryColor,
             ),
       ),
-      home: const MyHomePage(),
+      home: const HomePage(),
     );
   }
 }
