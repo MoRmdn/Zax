@@ -1,22 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:zax/bloc/app_bloc.dart';
-import 'package:zax/helper/app_config.dart';
-import 'package:zax/screens/home.dart';
+import 'package:zax/screens/home_page.dart';
 
-import 'api/login_api.dart';
-import 'api/notes_api.dart';
+import 'helper/app_config.dart';
 
 void main() => runApp(
       MultiBlocProvider(
-        providers: [
-          BlocProvider<AppBloc>(
-            create: (_) => AppBloc(
-              loginApi: LoginAPI.instance(),
-              notesApi: NoteAPI.instance(),
-            ),
-          ),
-        ],
+        providers: const [],
         child: const MyApp(),
       ),
     );
