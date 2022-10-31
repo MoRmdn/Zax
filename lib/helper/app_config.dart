@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart' show Color, Colors, Widget;
 
-import '../screens/widget/login_screen/iterable_list_view.dart';
-
 enum LoginErrorHandler {
   invalidData,
 }
@@ -12,11 +10,11 @@ enum AuthPageController {
   forgetPassword,
 }
 
-extension ToListView<T> on Iterable<T> {
-  Widget toListView() => IterableListView(
-        iterableList: this,
-      );
-}
+// extension ToListView<T> on Iterable<T> {
+//   Widget toListView() => IterableListView(
+//         iterableList: this,
+//       );
+// }
 
 class AppConfig {
   static const Color primaryColor = Color(0xff715CF8);
