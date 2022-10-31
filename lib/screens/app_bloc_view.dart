@@ -34,6 +34,7 @@ class AppBlocView<T extends AppBloc> extends StatelessWidget {
           } else if (appState.data != null) {
             // we have data
             return Image.memory(
+              //? memory because i convert it to unit8List
               appState.data!,
               fit: BoxFit.fitHeight,
             );

@@ -12,6 +12,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: AnnotatedRegion<SystemUiOverlayStyle>(
+        //? to make Notification Bar Dark
         value: SystemUiOverlayStyle.dark,
         child: Column(
           mainAxisSize: MainAxisSize.max,
