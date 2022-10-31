@@ -2,11 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zax/screens/home_page.dart';
 
+import 'bloc/bottom_bloc.dart';
+import 'bloc/top_bloc.dart';
 import 'helper/app_config.dart';
 
 void main() => runApp(
       MultiBlocProvider(
-        providers: const [],
+        providers: [
+          BlocProvider<TopBloc>(
+            create: (_) => TopBloc(
+              waitBeforeLoading: const Duration(seconds: 3),
+              urls: AppConfig.images,
+            ),
+          ),
+          BlocProvider<BottomBloc>(
+            create: (_) => BottomBloc(
+              waitBeforeLoading: const Duration(seconds: 3),
+              urls: AppConfig.images,
+            ),
+          ),
+        ],
         child: const MyApp(),
       ),
     );
